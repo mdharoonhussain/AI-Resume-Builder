@@ -84,6 +84,90 @@ const uploadResume = async (req, res) => {
   }
 };
 
+const getAnalysisHistory = async (req, res) => {
+  try {
+    const analyses = await Analysis.find({
+      userId: req.user.userId,
+    })
+      .select("fileName jobRole atsScore createdAt")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: analyses.length,
+      analyses,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getAnalysisById = async (req, res) => {
+  try {
+    const analysis = await Analysis.findById(req.params.id);
+
+    if (!analysis) {
+      return res.status(404).json({
+        success: false,
+        message: "Analysis not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      atsScore: analysis.atsScore,
+      matchedSkills: analysis.matchingSkills,
+      missingSkills: analysis.missingSkills,
+      suggestions: analysis.suggestions,
+      fileName: analysis.fileName,
+      jobRole: analysis.jobRole,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const deleteAnalysis = async (req, res) => {
+  try {
+    const analysis = await Analysis.findOne({
+      _id: req.params.id,
+      userId: req.user.userId,
+    });
+
+    if (!analysis) {
+      return res.status(404).json({
+        success: false,
+        message: "Analysis not found",
+      });
+    }
+
+    await Analysis.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Analysis deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   uploadResume,
+  getAnalysisHistory,
+  getAnalysisById,
+  deleteAnalysis,
 };

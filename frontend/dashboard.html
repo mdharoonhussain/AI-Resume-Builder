@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dashboard | AI Resume Analyzer</title>
+    <link rel="icon" type="image/png" href="./assets/logo.png" />
+
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+
+    <nav class="navbar">
+      <h2>AI Resume Analyzer</h2>
+
+      <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <!-- Main Container -->
+
+    <div class="container">
+      <!-- Welcome Section -->
+
+      <section class="welcome-section">
+        <h1 id="welcomeUser">Welcome 👋</h1>
+
+        <p>Upload your resume and analyze it against your target role.</p>
+      </section>
+
+      <!-- Upload Section -->
+
+      <section class="card">
+        <h2>Upload Resume</h2>
+
+        <form id="uploadForm">
+          <div class="form-group">
+            <label>Resume PDF</label>
+
+            <input type="file" id="resume" accept=".pdf" required />
+          </div>
+
+          <div class="form-group">
+            <label>Job Role</label>
+
+            <select id="jobRole" required>
+              <option value="">Select Job Role</option>
+
+              <option value="technicalSpecialist">Technical Specialist</option>
+
+              <option value="fullStackDeveloper">Full Stack Developer</option>
+
+              <option value="frontendDeveloper">Frontend Developer</option>
+
+              <option value="backendDeveloper">Backend Developer</option>
+
+              <option value="devopsEngineer">DevOps Engineer</option>
+            </select>
+          </div>
+
+          <button type="submit">Analyze Resume</button>
+        </form>
+
+        <p id="uploadMessage"></p>
+      </section>
+
+      <!-- ATS Result Section -->
+
+      <section class="card">
+        <h2>ATS Analysis Result</h2>
+
+        <div id="resultContainer">
+          <h3>
+            ATS Score:
+            <span id="atsScore"> -- </span>
+          </h3>
+
+          <div class="skills-container">
+            <div class="skills-box matched-box">
+              <h4>✅ Matched Skills</h4>
+              <div id="matchedSkills"></div>
+            </div>
+
+            <div class="skills-box missing-box">
+              <h4>❌ Missing Skills</h4>
+              <div id="missingSkills"></div>
+            </div>
+          </div>
+
+          <div class="suggestions-box">
+            <h4>💡 Suggestions</h4>
+            <div id="suggestions"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Section -->
+
+      <section class="card">
+        <h2>Analysis History</h2>
+
+        <div id="historyContainer">
+          <p>No analysis found.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+
+    <div id="deleteModal" class="modal">
+      <div class="modal-content">
+        <h3>Delete Analysis</h3>
+
+        <p>Are you sure you want to delete this analysis?</p>
+
+        <div class="modal-buttons">
+          <button id="confirmDeleteBtn" class="yes-btn">Yes</button>
+
+          <button id="cancelDeleteBtn" class="no-btn">No</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+
+    <div id="toast" class="toast">Analysis Deleted Successfully</div>
+
+    <script src="./js/dashboard.js"></script>
+  </body>
+</html>
