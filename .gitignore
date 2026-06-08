@@ -8,7 +8,8 @@ node_modules/
 
 # Uploaded Resume Files
 
-uploads/
+uploads/*
+!uploads/.gitkeep
 
 # Logs
 

@@ -6,6 +6,14 @@ const analyzeResume = require("../services/atsService");
 
 const uploadResume = async (req, res) => {
   try {
+    console.log("=== Upload API Hit ===");
+
+    console.log("File:", req.file);
+
+    console.log("Body:", req.body);
+
+    console.log("User:", req.user);
+
     // Check file upload
     if (!req.file) {
       return res.status(400).json({
@@ -24,58 +32,47 @@ const uploadResume = async (req, res) => {
       });
     }
 
+    console.log("Starting PDF Parse");
+
     // Extract text from resume
     const resumeText = await parseResume(req.file.path);
+
+    console.log("PDF Parse Success");
 
     // Analyze resume against selected job role
     const analysisResult = analyzeResume(resumeText, jobRole, jobDescription);
 
+    console.log("Saving Analysis");
+
     // Save analysis in MongoDB
     const analysis = await Analysis.create({
       userId: req.user.userId,
-
       jobRole: jobRole || "Custom JD",
-
       jobDescription: jobDescription || "",
-
       fileName: req.file.originalname,
-
       filePath: req.file.path,
-
       resumeText,
-
       atsScore: analysisResult.atsScore,
-
       matchingSkills: analysisResult.matchedSkills,
-
       missingSkills: analysisResult.missingSkills,
-
       suggestions: analysisResult.suggestions,
     });
+
+    console.log("Analysis Saved");
 
     // Response
     res.status(201).json({
       success: true,
       message: "Resume analyzed successfully",
-
       analysisId: analysis._id,
-
       fileName: analysis.fileName,
-
       jobRole: analysisResult.jobRole,
-
       jobDescription: analysisResult.jobDescription,
-
       atsScore: analysisResult.atsScore,
-
       totalMatchedSkills: analysisResult.totalMatchedSkills,
-
       totalRequiredSkills: analysisResult.totalRequiredSkills,
-
       matchedSkills: analysisResult.matchedSkills,
-
       missingSkills: analysisResult.missingSkills,
-
       suggestions: analysisResult.suggestions,
     });
   } catch (error) {

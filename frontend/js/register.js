@@ -13,7 +13,7 @@ registerForm.addEventListener("submit", async (e) => {
 
   try {
     const response = await fetch(
-      "https://ai-resume-analyzer-kbbv.onrender.com/api/auth/register",
+      "https://ai-resume-analyzer-iw0l.onrender.com/api/auth/register",
       {
         method: "POST",
 

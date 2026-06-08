@@ -15,7 +15,7 @@ loginForm.addEventListener("submit", async (e) => {
 
   try {
     const response = await fetch(
-      "https://ai-resume-analyzer-kbbv.onrender.com/api/auth/login",
+      "https://ai-resume-analyzer-iw0l.onrender.com/api/auth/login",
       {
         method: "POST",
 

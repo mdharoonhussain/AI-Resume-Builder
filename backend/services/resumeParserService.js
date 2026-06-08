@@ -9,6 +9,7 @@ const parseResume = async (filePath) => {
 
     return data.text;
   } catch (error) {
+    console.error("Resume Parse Error:", error);
     throw new Error("Error parsing resume");
   }
 };

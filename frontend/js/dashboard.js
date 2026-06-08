@@ -1,4 +1,4 @@
-const API_URL = "https://ai-resume-analyzer-kbbv.onrender.com/api";
+const API_URL = "https://ai-resume-analyzer-iw0l.onrender.com/api";
 
 const token = localStorage.getItem("token");
 
@@ -195,6 +195,12 @@ async function loadHistory() {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server Error:", errorText);
+      return;
+    }
 
     const data = await response.json();
 
