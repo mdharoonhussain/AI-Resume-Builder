@@ -299,7 +299,7 @@ Add screenshots here after uploading them to GitHub.
 
 GitHub: https://github.com/mdharoonhussain
 
-LinkedIn: [Add your LinkedIn profile link here](http://linkedin.com/in/md-haroon-hussain-b730561b3)
+LinkedIn:(http://linkedin.com/in/md-haroon-hussain-b730561b3)
 
 ---
 
