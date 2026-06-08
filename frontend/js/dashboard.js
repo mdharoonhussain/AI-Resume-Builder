@@ -12,6 +12,12 @@ const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 
 const toast = document.getElementById("toast");
 
+const pdfModal = document.getElementById("pdfModal");
+
+const pdfModalOkBtn = document.getElementById("pdfModalOkBtn");
+
+let currentAnalysis = null;
+
 let deleteId = null;
 
 // Redirect if not logged in
@@ -40,10 +46,21 @@ uploadForm.addEventListener("submit", async (e) => {
 
   const jobRole = document.getElementById("jobRole").value;
 
+  const jobDescription = document.getElementById("jobDescription").value;
+  if (!jobRole && !jobDescription.trim()) {
+    document.getElementById("uploadMessage").textContent =
+      "Please select a Job Role or paste a Job Description";
+
+    return;
+  }
+
   const formData = new FormData();
 
   formData.append("resume", file);
+
   formData.append("jobRole", jobRole);
+
+  formData.append("jobDescription", jobDescription);
 
   try {
     const response = await fetch(`${API_URL}/analysis/upload`, {
@@ -78,7 +95,37 @@ uploadForm.addEventListener("submit", async (e) => {
 
 // Display Analysis Result
 function displayAnalysis(data) {
-  document.getElementById("atsScore").textContent = `${data.atsScore}%`;
+  currentAnalysis = data;
+  console.log(currentAnalysis);
+  const score = data.atsScore;
+
+  document.getElementById("atsScore").textContent = `${score}%`;
+
+  const circle = document.getElementById("progressCircle");
+
+  const radius = 80;
+
+  const circumference = 2 * Math.PI * radius;
+
+  const offset = circumference - (score / 100) * circumference;
+
+  circle.style.strokeDashoffset = offset;
+
+  // Dynamic Color
+
+  if (score < 40) {
+    circle.style.stroke = "#ef4444"; // Red
+
+    document.getElementById("atsScore").style.color = "#ef4444";
+  } else if (score < 70) {
+    circle.style.stroke = "#f59e0b"; // Orange
+
+    document.getElementById("atsScore").style.color = "#f59e0b";
+  } else {
+    circle.style.stroke = "#10b981"; // Green
+
+    document.getElementById("atsScore").style.color = "#10b981";
+  }
 
   const matchedSkills = document.getElementById("matchedSkills");
 
@@ -115,6 +162,31 @@ function displayAnalysis(data) {
   });
 }
 
+function updateStatistics(analyses) {
+  const totalReports = analyses.length;
+
+  let highestScore = 0;
+
+  let totalScore = 0;
+
+  analyses.forEach((analysis) => {
+    totalScore += analysis.atsScore;
+
+    if (analysis.atsScore > highestScore) {
+      highestScore = analysis.atsScore;
+    }
+  });
+
+  const averageScore =
+    totalReports > 0 ? Math.round(totalScore / totalReports) : 0;
+
+  document.getElementById("totalReports").textContent = totalReports;
+
+  document.getElementById("highestScore").textContent = `${highestScore}%`;
+
+  document.getElementById("averageScore").textContent = `${averageScore}%`;
+}
+
 // Load History
 async function loadHistory() {
   try {
@@ -129,6 +201,7 @@ async function loadHistory() {
     const historyContainer = document.getElementById("historyContainer");
 
     historyContainer.innerHTML = "";
+    updateStatistics(data.analyses);
 
     data.analyses.forEach((analysis) => {
       historyContainer.innerHTML += `
@@ -233,7 +306,13 @@ function showToast(message) {
 }
 
 function clearAnalysisDisplay() {
-  document.getElementById("atsScore").textContent = "--";
+  document.getElementById("atsScore").textContent = "0%";
+
+  document.getElementById("atsScore").style.color = "#2563eb";
+
+  document.getElementById("progressCircle").style.stroke = "#2563eb";
+
+  document.getElementById("progressCircle").style.strokeDashoffset = 502;
 
   document.getElementById("matchedSkills").innerHTML = "";
 
@@ -241,6 +320,158 @@ function clearAnalysisDisplay() {
 
   document.getElementById("suggestions").innerHTML = "";
 }
+
+document.getElementById("downloadPdfBtn").addEventListener("click", () => {
+  if (!currentAnalysis) {
+    pdfModal.style.display = "flex";
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+  const logo = document.getElementById("pdfLogo");
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // =========================
+  // Header
+  // =========================
+
+  doc.setFillColor(37, 99, 235);
+
+  doc.rect(0, 0, 210, 30, "F");
+
+  // Logo
+
+  doc.addImage(logo, "PNG", 10, 5, 18, 18);
+
+  // Title
+
+  doc.setTextColor(255, 255, 255);
+
+  doc.setFontSize(22);
+
+  doc.text("AI Resume Analyzer", 35, 18);
+
+  // =========================
+  // User Details
+  // =========================
+
+  doc.setTextColor(0, 0, 0);
+
+  doc.setFontSize(12);
+
+  doc.text(`Candidate Name: ${user.name}`, 15, 40);
+
+  doc.text(`Job Role: ${currentAnalysis.jobRole || "N/A"}`, 15, 48);
+
+  doc.text(`Resume: ${currentAnalysis.fileName || "Resume.pdf"}`, 15, 56);
+
+  doc.text(`Generated On: ${new Date().toLocaleDateString()}`, 15, 64);
+
+  // =========================
+  // ATS Score Box
+  // =========================
+
+  doc.setFillColor(239, 246, 255);
+
+  doc.roundedRect(130, 35, 55, 35, 3, 3, "F");
+
+  doc.setFontSize(12);
+
+  doc.text("ATS Score", 145, 48);
+
+  doc.setFontSize(20);
+
+  doc.setTextColor(37, 99, 235);
+
+  doc.text(`${currentAnalysis.atsScore}%`, 148, 62);
+
+  // =========================
+  // Matched Skills
+  // =========================
+
+  let y = 85;
+
+  doc.setFillColor(220, 252, 231);
+
+  doc.roundedRect(15, y, 180, 35, 3, 3, "F");
+
+  doc.setTextColor(0, 0, 0);
+
+  doc.setFontSize(14);
+
+  doc.text("Matched Skills", 20, y + 10);
+
+  doc.setFontSize(11);
+
+  let matchedText = currentAnalysis.matchedSkills.join(", ");
+
+  doc.text(matchedText, 20, y + 22, {
+    maxWidth: 165,
+  });
+
+  // =========================
+  // Missing Skills
+  // =========================
+
+  y += 50;
+
+  doc.setFillColor(254, 226, 226);
+
+  doc.roundedRect(15, y, 180, 35, 3, 3, "F");
+
+  doc.setFontSize(14);
+
+  doc.text("Missing Skills", 20, y + 10);
+
+  doc.setFontSize(11);
+
+  let missingText = currentAnalysis.missingSkills.join(", ");
+
+  doc.text(missingText, 20, y + 22, {
+    maxWidth: 165,
+  });
+
+  // =========================
+  // Suggestions
+  // =========================
+
+  y += 50;
+
+  doc.setFillColor(239, 246, 255);
+
+  doc.roundedRect(15, y, 180, 55, 3, 3, "F");
+
+  doc.setFontSize(14);
+
+  doc.text("Suggestions", 20, y + 10);
+
+  doc.setFontSize(11);
+
+  let suggestionsText = currentAnalysis.suggestions.join("\n");
+
+  doc.text(suggestionsText, 20, y + 22, {
+    maxWidth: 165,
+  });
+
+  // =========================
+  // Footer
+  // =========================
+
+  doc.setFontSize(10);
+
+  doc.setTextColor(120, 120, 120);
+
+  doc.text("Generated by AI Resume Analyzer", 65, 285);
+
+  doc.save("ATS_Report.pdf");
+});
+
+pdfModalOkBtn.addEventListener("click", () => {
+  pdfModal.style.display = "none";
+});
 
 // Initial Load
 loadHistory();

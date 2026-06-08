@@ -15,12 +15,12 @@ const uploadResume = async (req, res) => {
     }
 
     // Check job role
-    const { jobRole } = req.body;
+    const { jobRole, jobDescription } = req.body;
 
-    if (!jobRole) {
+    if (!jobRole && !jobDescription) {
       return res.status(400).json({
         success: false,
-        message: "Please select a job role",
+        message: "Please select a Job Role or paste a Job Description",
       });
     }
 
@@ -28,13 +28,15 @@ const uploadResume = async (req, res) => {
     const resumeText = await parseResume(req.file.path);
 
     // Analyze resume against selected job role
-    const analysisResult = analyzeResume(resumeText, jobRole);
+    const analysisResult = analyzeResume(resumeText, jobRole, jobDescription);
 
     // Save analysis in MongoDB
     const analysis = await Analysis.create({
       userId: req.user.userId,
 
-      jobRole,
+      jobRole: jobRole || "Custom JD",
+
+      jobDescription: jobDescription || "",
 
       fileName: req.file.originalname,
 
@@ -61,6 +63,8 @@ const uploadResume = async (req, res) => {
       fileName: analysis.fileName,
 
       jobRole: analysisResult.jobRole,
+
+      jobDescription: analysisResult.jobDescription,
 
       atsScore: analysisResult.atsScore,
 

@@ -30,6 +30,25 @@
         <p>Upload your resume and analyze it against your target role.</p>
       </section>
 
+      <!-- Statistics Section -->
+
+      <section class="stats-container">
+        <div class="stat-card">
+          <h3 id="totalReports">0</h3>
+          <p>Total Reports</p>
+        </div>
+
+        <div class="stat-card">
+          <h3 id="highestScore">0%</h3>
+          <p>Highest ATS Score</p>
+        </div>
+
+        <div class="stat-card">
+          <h3 id="averageScore">0%</h3>
+          <p>Average ATS Score</p>
+        </div>
+      </section>
+
       <!-- Upload Section -->
 
       <section class="card">
@@ -45,7 +64,7 @@
           <div class="form-group">
             <label>Job Role</label>
 
-            <select id="jobRole" required>
+            <select id="jobRole">
               <option value="">Select Job Role</option>
 
               <option value="technicalSpecialist">Technical Specialist</option>
@@ -60,6 +79,35 @@
             </select>
           </div>
 
+          <br />
+          <h4>Or</h4>
+          <br />
+          <div class="form-group">
+            <label>Paste Job Description (Optional)</label>
+
+            <textarea
+              id="jobDescription"
+              rows="8"
+              placeholder="Paste complete job description here...
+
+
+We are looking for a Full Stack Developer with experience in:
+
+* React
+* Node.js
+* MongoDB
+* AWS
+* Docker
+* CI/CD
+* REST APIs"
+            ></textarea>
+
+            <small class="info-text">
+              If Job Description is provided, ATS score will be calculated using
+              the Job Description instead of the selected Job Role.
+            </small>
+          </div>
+
           <button type="submit">Analyze Resume</button>
         </form>
 
@@ -72,10 +120,25 @@
         <h2>ATS Analysis Result</h2>
 
         <div id="resultContainer">
-          <h3>
-            ATS Score:
-            <span id="atsScore"> -- </span>
-          </h3>
+          <div class="ats-score-container">
+            <div class="progress-circle">
+              <svg width="180" height="180">
+                <circle class="bg-circle" cx="90" cy="90" r="70"></circle>
+
+                <circle
+                  id="progressCircle"
+                  class="progress-circle-fill"
+                  cx="90"
+                  cy="90"
+                  r="80"
+                ></circle>
+              </svg>
+
+              <div class="score-text">
+                <span id="atsScore">0%</span>
+              </div>
+            </div>
+          </div>
 
           <div class="skills-container">
             <div class="skills-box matched-box">
@@ -92,6 +155,10 @@
           <div class="suggestions-box">
             <h4>💡 Suggestions</h4>
             <div id="suggestions"></div>
+          </div>
+
+          <div class="download-section">
+            <button id="downloadPdfBtn">📄 Download Report PDF</button>
           </div>
         </div>
       </section>
@@ -123,9 +190,25 @@
       </div>
     </div>
 
+    <div id="pdfModal" class="modal">
+      <div class="modal-content">
+        <h3>Download Report</h3>
+
+        <p>Please analyze a resume first.</p>
+
+        <div class="modal-buttons">
+          <button id="pdfModalOkBtn" class="yes-btn">OK</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Success Toast -->
 
     <div id="toast" class="toast">Analysis Deleted Successfully</div>
+
+    <img id="pdfLogo" src="./assets/logo.png" style="display: none" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script src="./js/dashboard.js"></script>
   </body>

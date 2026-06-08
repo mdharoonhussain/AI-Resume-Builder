@@ -14,6 +14,11 @@ const analysisSchema = new mongoose.Schema(
       trim: true,
     },
 
+    jobDescription: {
+      type: String,
+      default: "",
+    },
+
     fileName: {
       type: String,
       required: true,

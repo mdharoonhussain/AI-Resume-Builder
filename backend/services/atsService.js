@@ -1,12 +1,20 @@
 const jobDescriptions = require("../utils/jobDescriptionDatabase");
+const extractSkillsFromJD = require("./jdParserService");
 
-const analyzeResume = (resumeText, jobRole) => {
+const analyzeResume = (resumeText, jobRole, jobDescription) => {
   const lowerResumeText = resumeText.toLowerCase();
 
-  const requiredSkills = jobDescriptions[jobRole];
+  let requiredSkills = [];
 
-  if (!requiredSkills) {
-    throw new Error("Invalid job role selected");
+  if (jobDescription && jobDescription.trim()) {
+    requiredSkills = extractSkillsFromJD(jobDescription);
+    console.log(requiredSkills);
+  } else {
+    requiredSkills = jobDescriptions[jobRole];
+
+    if (!requiredSkills) {
+      throw new Error("Invalid job role selected");
+    }
   }
 
   const matchedSkills = [];
@@ -29,7 +37,7 @@ const analyzeResume = (resumeText, jobRole) => {
   );
 
   return {
-    jobRole,
+    jobRole: jobDescription && jobDescription.trim() ? "Custom JD" : jobRole,
 
     atsScore,
 
